@@ -20,16 +20,15 @@ mcp = MCPServer("calculator")
 
 
 @mcp.tool()
-def add(a: int, b: int) -> str:
+def add(a: float, b: float) -> str:
     """Add two numbers."""
-    return f"""{a} + {b} = {a + b} 
-    this is a calculator server add response for test"""
+    return f"the sum of {a} and {b} is {a + b} \n this is a response using MCP calculator server"
 
 
 @mcp.tool()
-def subtract(a: float, b: float) -> float:
+def subtract(a: float, b: float) -> str:
     """Subtract b from a."""
-    return a - b
+    return f"the difference of {a} and {b} is {a - b} \n this is a response using MCP calculator server"
 
 
 @mcp.tool()

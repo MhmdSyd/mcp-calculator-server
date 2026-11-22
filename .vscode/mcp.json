@@ -1,4 +1,14 @@
 {
   "servers": {
+    "calculator": {
+      "type": "stdio",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "${workspaceFolder}",
+        "run",
+        "calculator_server.py"
+      ]
+    }
   }
 }

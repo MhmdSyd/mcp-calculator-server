@@ -162,6 +162,70 @@ To serve over HTTP instead of stdio, change the last line of `calculator_server.
 mcp.run(transport="streamable-http")
 ```
 
+## Ollama client (local LLM + MCP)
+
+`ollama_client.py` is an MCP **client** that connects to this calculator server and lets a local [Ollama](https://ollama.com) model use its tools. The default model is `gemma4:12b`.
+
+```
+You ──▶ ollama_client.py ──▶ Ollama (gemma4:12b)
+              │                     │  "call multiply(127, 43)"
+              ▼                     │
+        MCP stdio  ◀────────────────┘
+              ▼
+     calculator_server.py  ──▶ result ──▶ back to the model ──▶ final answer
+```
+
+### Prerequisites
+
+1. Install [Ollama](https://ollama.com/download) and make sure it is running.
+2. Pull the model (tool calling needs a recent Ollama version, so update Ollama if tool calls fail):
+   ```bash
+   ollama pull gemma4:12b
+   ```
+3. Install the project dependencies (includes the `ollama` Python package):
+   ```bash
+   uv sync          # or: pip install -r requirements.txt
+   ```
+
+### Run it
+
+```bash
+uv run ollama_client.py                        # interactive chat
+uv run ollama_client.py -p "What is 127 * 43, then its square root?"
+uv run ollama_client.py --model gemma4:12b     # choose another Ollama model
+```
+
+(With pip, use `python ollama_client.py ...` instead of `uv run ollama_client.py ...`.)
+
+Example session:
+
+```
+You> What is 127 times 43?
+  [tool] multiply(a=127, b=43)
+  [result] 5461.0
+Assistant> 127 times 43 is 5,461.
+```
+
+Chat commands: `/tools` lists the MCP tools, `/reset` clears the conversation, `exit` quits.
+
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `-m`, `--model` | Ollama model name (default `gemma4:12b`) |
+| `-s`, `--server` | Path to the MCP server script (default `calculator_server.py`) |
+| `-p`, `--prompt` | Ask one question and exit |
+| `--host` | Ollama URL if not `http://localhost:11434` |
+
+### How it works
+
+1. Starts `calculator_server.py` as a subprocess and connects over stdio.
+2. Reads the server's tools and converts their JSON schemas to Ollama's tool format.
+3. Sends your message plus the tools to the model.
+4. Runs any tool calls the model requests through the MCP server and returns the results to the model, until it gives a final answer.
+
+Small local models are less reliable at tool calling than large hosted ones. If the model answers without calling a tool, rephrase with "use the calculator tool".
+
 ## Troubleshooting
 
 - **Server doesn't show up in Claude Desktop:** check `claude_desktop_config.json` for JSON syntax errors, then fully restart the app. Logs are in `%APPDATA%\Claude\logs\` (Windows) or `~/Library/Logs/Claude/` (macOS); look for `mcp-server-calculator.log`.
@@ -180,6 +244,7 @@ mcp-calculator-server/
 ├── calculator_server.py                # The MCP server
 ├── pyproject.toml                      # Project metadata and dependencies (uv)
 ├── requirements.txt                    # Dependencies for pip users
+├── ollama_client.py                    # MCP client using a local Ollama model
 ├── claude_desktop_config.example.json  # Example Claude Desktop config
 ├── .vscode/mcp.json                    # VS Code / GitHub Copilot MCP config
 ├── .gitignore
