@@ -1,0 +1,10 @@
+[project]
+name = "mcp-calculator-server"
+version = "0.1.0"
+description = "A simple MCP calculator server built with the MCP Python SDK"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "mcp[cli]>=1.2.0",
+]

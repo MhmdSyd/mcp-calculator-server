@@ -1,0 +1,17 @@
+{
+	"mcpServers": {
+		"calculator": {
+			"type": "stdio",
+			"command": "uv",
+			"args": [
+				"--directory",
+				"D:\\1.Weekly-Project\\mcp-calculator-server\\mcp-calculator-server",
+				"run",
+				"calculator_server.py"
+			],
+			"tools": [
+				"*"
+			]
+		}
+	}
+}
